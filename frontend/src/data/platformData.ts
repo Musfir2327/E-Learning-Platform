@@ -25,10 +25,55 @@ export const courses: Course[] = [
     summary:
       'Build component-driven interfaces, manage state, and ship a portfolio-ready React application.',
     lessons: [
-      { id: 'r1', title: 'Project setup and JSX basics', duration: '18 min', type: 'video', isCompleted: true },
-      { id: 'r2', title: 'Props, state, and events', duration: '32 min', type: 'video', isCompleted: true },
-      { id: 'r3', title: 'Type-safe component patterns', duration: '26 min', type: 'reading', isCompleted: true },
-      { id: 'r4', title: 'React knowledge check', duration: '10 min', type: 'quiz', isCompleted: false },
+      {
+        id: 'r1',
+        title: 'Project setup and JSX basics',
+        duration: '18 min',
+        type: 'video',
+        isCompleted: true,
+        youtubeId: 'SqcY0GlETPk',
+        relatedVideos: [
+          { id: 'SqcY0GlETPk', title: 'React JS Crash Course for Beginners 2026', duration: '18 min', channel: 'Programming with Mosh' },
+          { id: 'bMknfKXIFA8', title: 'React Full Course - Beginner to Pro', duration: '25 min', channel: 'FreeCodeCamp' },
+          { id: 'w7ejDZ8SWv8', title: 'JSX & React Components Deep Dive', duration: '15 min', channel: 'Academind' }
+        ]
+      },
+      {
+        id: 'r2',
+        title: 'Props, state, and events',
+        duration: '32 min',
+        type: 'video',
+        isCompleted: true,
+        youtubeId: 'TNhaISOUy6Q',
+        relatedVideos: [
+          { id: 'TNhaISOUy6Q', title: 'React Props and useState Hook Complete Guide', duration: '32 min', channel: 'Fireship' },
+          { id: 'O6P86uwfdR0', title: 'Understanding State vs Props in React', duration: '20 min', channel: 'Web Dev Simplified' }
+        ]
+      },
+      {
+        id: 'r3',
+        title: 'Type-safe component patterns',
+        duration: '26 min',
+        type: 'reading',
+        isCompleted: true,
+        youtubeId: 'zQnBQ4tB3ZA',
+        content: 'TypeScript with React allows you to define strict type interfaces for Props, Component State, and Event Handlers.\n\nExample:\n`type ButtonProps = { label: string; onClick: () => void }`\n\nUsing typed props eliminates runtime undefined crashes.',
+        relatedVideos: [
+          { id: 'zQnBQ4tB3ZA', title: 'TypeScript with React - Complete Practical Guide', duration: '26 min', channel: 'Codevolution' },
+          { id: 'BCg4qkfn5A4', title: 'Advanced React Component Types in TS', duration: '22 min', channel: 'Matt Pocock' }
+        ]
+      },
+      {
+        id: 'r4',
+        title: 'React knowledge check',
+        duration: '10 min',
+        type: 'quiz',
+        isCompleted: false,
+        youtubeId: 'LDB4uaJ87e0',
+        relatedVideos: [
+          { id: 'LDB4uaJ87e0', title: 'React Interview Questions & Knowledge Practice', duration: '10 min', channel: 'Tech With Tim' }
+        ]
+      },
     ],
     quiz: [
       {
@@ -78,10 +123,54 @@ export const courses: Course[] = [
     summary:
       'A W3Schools-style path with concise examples, practice editors, quizzes, and checkpoints.',
     lessons: [
-      { id: 'j1', title: 'Variables and scope', duration: '20 min', type: 'reading', isCompleted: true },
-      { id: 'j2', title: 'Functions and closures', duration: '42 min', type: 'video', isCompleted: true },
-      { id: 'j3', title: 'Async JavaScript', duration: '34 min', type: 'video', isCompleted: false },
-      { id: 'j4', title: 'DOM practice quiz', duration: '12 min', type: 'quiz', isCompleted: false },
+      {
+        id: 'j1',
+        title: 'Variables and scope',
+        duration: '20 min',
+        type: 'reading',
+        isCompleted: true,
+        youtubeId: 'hdI2bqOjy3c',
+        content: 'JavaScript variables can be declared using `var`, `let`, or `const`.\n\n- `var` is function-scoped and hoisted.\n- `let` and `const` are block-scoped. `const` variables cannot be reassigned.\n\nUnderstanding scope prevents bugs arising from unexpected variable modifications.',
+        relatedVideos: [
+          { id: 'hdI2bqOjy3c', title: 'JavaScript Variables, Hoisting & Scope Explained', duration: '20 min', channel: 'Traversy Media' },
+          { id: 'gigtS1JWD-g', title: 'var vs let vs const in 10 minutes', duration: '10 min', channel: 'Fireship' }
+        ]
+      },
+      {
+        id: 'j2',
+        title: 'Functions and closures',
+        duration: '42 min',
+        type: 'video',
+        isCompleted: true,
+        youtubeId: 'vDJpGenyHaA',
+        relatedVideos: [
+          { id: 'vDJpGenyHaA', title: 'JavaScript Closures Fully Explained', duration: '42 min', channel: 'Akshay Saini' },
+          { id: '3a0I8ICR1Vg', title: 'Arrow Functions & Scope in JS', duration: '18 min', channel: 'Web Dev Simplified' }
+        ]
+      },
+      {
+        id: 'j3',
+        title: 'Async JavaScript',
+        duration: '34 min',
+        type: 'video',
+        isCompleted: false,
+        youtubeId: 'PoRJizFvM7s',
+        relatedVideos: [
+          { id: 'PoRJizFvM7s', title: 'Async JS: Callbacks, Promises, Async/Await', duration: '34 min', channel: 'Traversy Media' },
+          { id: 'VN2E5O0d9fM', title: 'JavaScript Event Loop & Async Code', duration: '26 min', channel: 'Fireship' }
+        ]
+      },
+      {
+        id: 'j4',
+        title: 'DOM practice quiz',
+        duration: '12 min',
+        type: 'quiz',
+        isCompleted: false,
+        youtubeId: 'y17RuWkWdn8',
+        relatedVideos: [
+          { id: 'y17RuWkWdn8', title: 'JavaScript DOM Manipulation Crash Course', duration: '12 min', channel: 'FreeCodeCamp' }
+        ]
+      },
     ],
     quiz: [
       {
@@ -131,10 +220,52 @@ export const courses: Course[] = [
     summary:
       'Turn raw course activity into visual reports for instructors and platform administrators.',
     lessons: [
-      { id: 'd1', title: 'Dashboard information architecture', duration: '28 min', type: 'video', isCompleted: true },
-      { id: 'd2', title: 'Metrics that matter', duration: '24 min', type: 'reading', isCompleted: false },
-      { id: 'd3', title: 'Charts and accessibility', duration: '36 min', type: 'video', isCompleted: false },
-      { id: 'd4', title: 'Analytics scenario quiz', duration: '15 min', type: 'quiz', isCompleted: false },
+      {
+        id: 'd1',
+        title: 'Dashboard information architecture',
+        duration: '28 min',
+        type: 'video',
+        isCompleted: true,
+        youtubeId: '31p7fQJ48xU',
+        relatedVideos: [
+          { id: '31p7fQJ48xU', title: 'Dashboard UI/UX Architecture & Layout', duration: '28 min', channel: 'Design Course' },
+          { id: 'gW90B5D34-0', title: 'Analytics Dashboard Design Masterclass', duration: '24 min', channel: 'FreeCodeCamp' }
+        ]
+      },
+      {
+        id: 'd2',
+        title: 'Metrics that matter',
+        duration: '24 min',
+        type: 'reading',
+        isCompleted: false,
+        youtubeId: 'gW90B5D34-0',
+        content: 'Key Performance Indicators (KPIs) track active users, completion rates, assessment pass scores, and course retention.',
+        relatedVideos: [
+          { id: 'gW90B5D34-0', title: 'Key Data Analytics & Product Metrics', duration: '24 min', channel: 'DataCamp' }
+        ]
+      },
+      {
+        id: 'd3',
+        title: 'Charts and accessibility',
+        duration: '36 min',
+        type: 'video',
+        isCompleted: false,
+        youtubeId: '2LhoCfjm8R4',
+        relatedVideos: [
+          { id: '2LhoCfjm8R4', title: 'Data Visualization & Charts Tutorial', duration: '36 min', channel: 'Web Dev Simplified' }
+        ]
+      },
+      {
+        id: 'd4',
+        title: 'Analytics scenario quiz',
+        duration: '15 min',
+        type: 'quiz',
+        isCompleted: false,
+        youtubeId: 'r-uOLxNrNk8',
+        relatedVideos: [
+          { id: 'r-uOLxNrNk8', title: 'Data Analytics Case Study Overview', duration: '15 min', channel: 'Simplilearn' }
+        ]
+      },
     ],
     quiz: [
       {
@@ -184,11 +315,63 @@ export const courses: Course[] = [
     summary:
       'Master version control, branches, pull requests, merge conflicts, and collaborate using GitHub.',
     lessons: [
-      { id: 'g1', title: 'Introduction to Git & Version Control', duration: '15 min', type: 'video', isCompleted: false },
-      { id: 'g2', title: 'Local Git workflow: init, add, commit', duration: '20 min', type: 'reading', isCompleted: false },
-      { id: 'g3', title: 'GitHub: Remotes, pushing, and cloning', duration: '25 min', type: 'video', isCompleted: false },
-      { id: 'g4', title: 'Git checkout and branch management', duration: '18 min', type: 'video', isCompleted: false },
-      { id: 'g5', title: 'Git & GitHub Knowledge Check', duration: '12 min', type: 'quiz', isCompleted: false },
+      {
+        id: 'g1',
+        title: 'Introduction to Git & Version Control',
+        duration: '15 min',
+        type: 'video',
+        isCompleted: false,
+        youtubeId: 'RGOj5yH7evk',
+        relatedVideos: [
+          { id: 'RGOj5yH7evk', title: 'Git & GitHub Crash Course for Beginners', duration: '15 min', channel: 'FreeCodeCamp' },
+          { id: 'usYyQKDAgxs', title: 'Git Basics in 15 Minutes', duration: '15 min', channel: 'Fireship' }
+        ]
+      },
+      {
+        id: 'g2',
+        title: 'Local Git workflow: init, add, commit',
+        duration: '20 min',
+        type: 'reading',
+        isCompleted: false,
+        youtubeId: '8JJ101D3knE',
+        content: 'Git tracks changes locally using repository staging:\n\n1. `git init` - Initializes repository\n2. `git add .` - Stages modified files\n3. `git commit -m "msg"` - Saves snapshot to commit history',
+        relatedVideos: [
+          { id: '8JJ101D3knE', title: 'Git Init, Add & Commit Workflow', duration: '20 min', channel: 'Traversy Media' }
+        ]
+      },
+      {
+        id: 'g3',
+        title: 'GitHub: Remotes, pushing, and cloning',
+        duration: '25 min',
+        type: 'video',
+        isCompleted: false,
+        youtubeId: 'DVRQoVRHMIY',
+        relatedVideos: [
+          { id: 'DVRQoVRHMIY', title: 'GitHub Push & Pull Remote Tutorial', duration: '25 min', channel: 'CS Dojo' }
+        ]
+      },
+      {
+        id: 'g4',
+        title: 'Git checkout and branch management',
+        duration: '18 min',
+        type: 'video',
+        isCompleted: false,
+        youtubeId: 'e2IbNHi4uCI',
+        relatedVideos: [
+          { id: 'e2IbNHi4uCI', title: 'Git Branches & Merge Conflicts Explained', duration: '18 min', channel: 'Web Dev Simplified' }
+        ]
+      },
+      {
+        id: 'g5',
+        title: 'Git & GitHub Knowledge Check',
+        duration: '12 min',
+        type: 'quiz',
+        isCompleted: false,
+        youtubeId: 'usYyQKDAgxs',
+        relatedVideos: [
+          { id: 'usYyQKDAgxs', title: 'Git Essentials Quiz Prep', duration: '12 min', channel: 'Fireship' }
+        ]
+      },
     ],
     quiz: [
       {
@@ -238,11 +421,62 @@ export const courses: Course[] = [
     summary:
       'Automate repetitive workflows, parse web pages, read CSV/JSON logs, and write system scripts with Python.',
     lessons: [
-      { id: 'p1', title: 'Setting up Python & VS Code', duration: '15 min', type: 'video', isCompleted: false },
-      { id: 'p2', title: 'Control structures: loops and conditionals', duration: '25 min', type: 'reading', isCompleted: false },
-      { id: 'p3', title: 'Reading & writing local files (CSV, JSON)', duration: '30 min', type: 'video', isCompleted: false },
-      { id: 'p4', title: 'Web scraping with BeautifulSoup', duration: '35 min', type: 'video', isCompleted: false },
-      { id: 'p5', title: 'Python Automation Practice Check', duration: '15 min', type: 'quiz', isCompleted: false },
+      {
+        id: 'p1',
+        title: 'Setting up Python & VS Code',
+        duration: '15 min',
+        type: 'video',
+        isCompleted: false,
+        youtubeId: 'kqtD5dpn9C8',
+        relatedVideos: [
+          { id: 'kqtD5dpn9C8', title: 'Python Tutorial for Beginners with VS Code', duration: '15 min', channel: 'Programming with Mosh' }
+        ]
+      },
+      {
+        id: 'p2',
+        title: 'Control structures: loops and conditionals',
+        duration: '25 min',
+        type: 'reading',
+        isCompleted: false,
+        youtubeId: '6iF8Xb7Z3wQ',
+        content: 'Python uses indentation to define code blocks inside `if`, `elif`, `else`, `for`, and `while` loops.',
+        relatedVideos: [
+          { id: '6iF8Xb7Z3wQ', title: 'Python Conditionals & Loops Masterclass', duration: '25 min', channel: 'Corey Schafer' }
+        ]
+      },
+      {
+        id: 'p3',
+        title: 'Reading & writing local files (CSV, JSON)',
+        duration: '30 min',
+        type: 'video',
+        isCompleted: false,
+        youtubeId: 'vTX3DvySkP8',
+        relatedVideos: [
+          { id: 'vTX3DvySkP8', title: 'Python File Parsing CSV & JSON Tutorial', duration: '30 min', channel: 'Corey Schafer' }
+        ]
+      },
+      {
+        id: 'p4',
+        title: 'Web scraping with BeautifulSoup',
+        duration: '35 min',
+        type: 'video',
+        isCompleted: false,
+        youtubeId: 'XVv6mJpFOb0',
+        relatedVideos: [
+          { id: 'XVv6mJpFOb0', title: 'Python Web Scraping with BeautifulSoup', duration: '35 min', channel: 'FreeCodeCamp' }
+        ]
+      },
+      {
+        id: 'p5',
+        title: 'Python Automation Practice Check',
+        duration: '15 min',
+        type: 'quiz',
+        isCompleted: false,
+        youtubeId: 'PXMJ6FS7llk',
+        relatedVideos: [
+          { id: 'PXMJ6FS7llk', title: 'Python Automation Scripts Project', duration: '15 min', channel: 'Tech With Tim' }
+        ]
+      },
     ],
     quiz: [
       {

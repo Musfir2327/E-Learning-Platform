@@ -2,26 +2,29 @@ type MetricCardProps = {
   label: string
   value: string | number
   detail: string
-  tone?: 'green' | 'blue' | 'amber' | 'rose'
+  tone?: 'green' | 'blue' | 'amber' | 'rose' | 'indigo' | 'purple'
 }
 
 const toneClasses = {
-  green: 'border-emerald-500/25 bg-emerald-500/10 text-emerald-400',
-  blue: 'border-sky-500/25 bg-sky-500/10 text-sky-400',
-  amber: 'border-amber-500/25 bg-amber-500/10 text-amber-400',
-  rose: 'border-rose-500/25 bg-rose-500/10 text-rose-400',
+  indigo: 'border-indigo-200 bg-indigo-100/80 text-indigo-900 font-black',
+  purple: 'border-purple-200 bg-purple-100/80 text-purple-900 font-black',
+  green: 'border-emerald-200 bg-emerald-100/80 text-emerald-900 font-black',
+  blue: 'border-sky-200 bg-sky-100/80 text-sky-900 font-black',
+  amber: 'border-amber-200 bg-amber-100/80 text-amber-900 font-black',
+  rose: 'border-rose-200 bg-rose-100/80 text-rose-900 font-black',
 }
 
-export function MetricCard({ label, value, detail, tone = 'green' }: MetricCardProps) {
+export function MetricCard({ label, value, detail, tone = 'indigo' }: MetricCardProps) {
+  const toneKey = toneClasses[tone] ? tone : 'indigo'
   return (
-    <article className="glass-panel rounded-2xl p-5.5 shadow-md flex flex-col justify-between">
+    <article className="rounded-3xl bg-white border border-slate-200 p-6 shadow-xs flex flex-col justify-between hover:shadow-md transition-all hover:-translate-y-0.5">
       <div>
-        <div className={`mb-3 inline-flex rounded-lg border px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider ${toneClasses[tone]}`}>
+        <div className={`mb-3 inline-flex rounded-xl border px-3 py-1 text-[10px] uppercase tracking-wider ${toneClasses[toneKey]}`}>
           {label}
         </div>
-        <p className="text-3xl font-black tracking-tight text-white">{value}</p>
+        <p className="text-3xl font-black tracking-tight text-slate-900">{value}</p>
       </div>
-      <p className="mt-2 text-xs font-semibold text-slate-400 leading-snug">{detail}</p>
+      <p className="mt-2 text-xs font-bold text-slate-700 leading-snug">{detail}</p>
     </article>
   )
 }

@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { AdminDashboard } from './components/AdminDashboard'
 import { CertificatePanel } from './components/CertificatePanel'
 import { CourseCard } from './components/CourseCard'
@@ -7,16 +8,21 @@ import { LessonPlayer } from './components/LessonPlayer'
 import { MarketingHome } from './components/MarketingHome'
 import { MetricCard } from './components/MetricCard'
 import { ProgressPanel } from './components/ProgressPanel'
-import { QuizPanel } from './components/QuizPanel'
+import { QuizPanel, triggerCelebrationConfetti } from './components/QuizPanel'
 import { TutorialWorkspace } from './components/TutorialWorkspace'
 import { Login } from './components/Login'
-import { Chatbot } from './components/Chatbot'
+import { CareerPathwayContainer } from './components/CareerPathway/CareerPathwayContainer'
 import { adminStats, learningTracks, partnerLogos, tutorialTopics } from './data/platformData'
 import type { Lesson, Learner, Course } from './types'
+import { ArrowRight, HelpCircle } from 'lucide-react'
 
 function App() {
   const [currentUser, setCurrentUser] = useState<Learner | null>(null)
-  const [activeView, setActiveView] = useState('Home')
+  const [activeView, setActiveView] = useState(() =>
+    window.location.pathname === '/career-pathway' || window.location.hash.includes('career-pathway')
+      ? 'Career Pathway'
+      : 'Home'
+  )
   const [coursesList, setCoursesList] = useState<Course[]>([])
   const [selectedCourseId, setSelectedCourseId] = useState('')
   const [completedLessonIds, setCompletedLessonIds] = useState<string[]>([])
@@ -24,6 +30,12 @@ function App() {
   const [passedQuizCourseIds, setPassedQuizCourseIds] = useState<string[]>([])
   const [celebrationCourse, setCelebrationCourse] = useState<string | null>(null)
   const [stats, setStats] = useState<any[]>(adminStats)
+
+  useEffect(() => {
+    if (celebrationCourse) {
+      triggerCelebrationConfetti()
+    }
+  }, [celebrationCourse])
 
   // Fetch courses from backend
   const fetchCourses = async () => {
@@ -84,7 +96,6 @@ function App() {
         setCompletedTopicIds(data.completedTopicIds || [])
         setPassedQuizCourseIds(data.passedQuizCourseIds || [])
       } else {
-        // Token expired/invalid
         localStorage.removeItem('token')
         setCurrentUser(null)
       }
@@ -93,26 +104,22 @@ function App() {
     }
   }
 
-  // Load initial application data
   useEffect(() => {
     fetchCourses()
   }, [])
 
-  // Load user profile once courses are fetched
   useEffect(() => {
     if (coursesList.length > 0) {
       fetchProfile()
     }
   }, [coursesList])
 
-  // Fetch admin stats when admin logs in or views Dashboard
   useEffect(() => {
     if (currentUser?.role === 'Admin' && activeView === 'Admin') {
       fetchAdminStats()
     }
   }, [currentUser, activeView])
 
-  // Compute dynamic completed lessons object per course id
   const completedLessonsByCourse = useMemo(() => {
     const initial: Record<string, string[]> = {}
     coursesList.forEach((course) => {
@@ -123,7 +130,6 @@ function App() {
     return initial
   }, [coursesList, completedLessonIds])
 
-  // Compute dynamic courses array where progress field updates dynamically
   const dynamicCourses = useMemo(() => {
     return coursesList.map((course) => {
       const completedIds = completedLessonsByCourse[course.id] ?? []
@@ -425,7 +431,7 @@ function App() {
 
     if (activeView === 'Lessons') {
       if (!selectedCourse || !selectedLesson) {
-        return <div className="text-slate-400 font-semibold">No lessons available. Enroll in a course to start.</div>
+        return <div className="text-[#64748B] font-semibold">No lessons available. Enroll in a course to start.</div>
       }
       return (
         <LessonPlayer
@@ -435,6 +441,7 @@ function App() {
           isCourseCompleted={courseCompletion[selectedCourse.id] ?? false}
           onLessonSelect={setSelectedLessonState}
           onCompleteLesson={handleCompleteLesson}
+          onGoToQuiz={() => setActiveView('Quizzes')}
         />
       )
     }
@@ -449,8 +456,12 @@ function App() {
       )
     }
 
+    if (activeView === 'Career Pathway' || activeView === 'CareerPathway') {
+      return <CareerPathwayContainer />
+    }
+
     if (activeView === 'Quizzes') {
-      if (!selectedCourse) return <div className="text-slate-400 font-semibold">Please select a course first.</div>
+      if (!selectedCourse) return <div className="text-[#64748B] font-semibold">Please select a course first.</div>
       const isLocked = selectedCourse.progress !== 100
       const hasPassed = passedQuizCourseIds.includes(selectedCourse.id)
       return (
@@ -459,6 +470,7 @@ function App() {
           isLocked={isLocked}
           hasPassed={hasPassed}
           onPass={() => handleQuizPass(selectedCourse.id)}
+          onGoToCertificate={() => setActiveView('Certificates')}
         />
       )
     }
@@ -486,7 +498,7 @@ function App() {
     }
 
     if (!selectedCourse) {
-      return <div className="text-slate-400 font-semibold text-center py-10">No courses loaded yet.</div>
+      return <div className="text-[#64748B] font-semibold text-center py-10">No courses loaded yet.</div>
     }
 
     return (
@@ -514,32 +526,32 @@ function App() {
         </section>
 
         <section className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-          <div className="overflow-hidden rounded-2xl border border-white/5 bg-slate-900/40 shadow-lg flex flex-col justify-between">
-            <img className="h-64 w-full object-cover border-b border-white/5" src={selectedCourse.image} alt="" />
+          <div className="overflow-hidden brand-card shadow-sm flex flex-col justify-between">
+            <img className="h-64 w-full object-cover border-b border-[#E2E8F0]" src={selectedCourse.image} alt="" />
             <div className="p-6 space-y-4">
               <div>
-                <p className="text-xs font-black uppercase tracking-wider text-emerald-400">Continue learning</p>
-                <h1 className="mt-1 text-2xl font-black tracking-tight text-white">{selectedCourse.title}</h1>
-                <p className="mt-2 text-xs leading-relaxed text-slate-400 font-medium">{selectedCourse.summary}</p>
+                <p className="text-xs font-black uppercase tracking-wider text-[#4F39F6]">Continue learning</p>
+                <h1 className="mt-1 text-2xl font-black tracking-tight text-[#0F172B]">{selectedCourse.title}</h1>
+                <p className="mt-2 text-xs leading-relaxed text-[#334155] font-semibold">{selectedCourse.summary}</p>
               </div>
               <div className="flex flex-wrap gap-3">
                 <button
                   type="button"
                   onClick={() => setActiveView('Lessons')}
-                  className="rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 px-5.5 py-3 text-xs font-extrabold uppercase tracking-wider text-white shadow-lg shadow-emerald-500/20 btn-shimmer hover:brightness-110 cursor-pointer"
+                  className="btn-primary btn-shimmer py-3 px-6 text-xs font-extrabold cursor-pointer"
                 >
                   Resume lesson
                 </button>
                 <button
                   type="button"
                   onClick={() => setActiveView('Quizzes')}
-                  className={`rounded-xl border px-5.5 py-3 text-xs font-extrabold uppercase tracking-wider transition-all duration-300 ${
+                  className={`rounded-2xl border px-6 py-3 text-xs font-extrabold uppercase tracking-wider transition-all duration-300 ${
                     quizLocked
-                      ? 'border-amber-500/25 bg-amber-500/10 text-amber-400'
-                      : 'border-white/10 text-slate-300 hover:bg-white/5 cursor-pointer'
+                      ? 'border-[#F59E0B]/30 bg-[#FFFBEB] text-[#B45309]'
+                      : 'btn-secondary cursor-pointer'
                   }`}
                 >
-                  {quizLocked ? 'Quiz locked' : 'Take quiz'}
+                  {quizLocked ? 'Quiz locked' : 'Take 5-Question Quiz'}
                 </button>
               </div>
             </div>
@@ -552,66 +564,74 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0b0f19] text-slate-100 pb-16">
+    <div className="min-h-screen bg-[#F8FAFC] text-[#0F172B] pb-16 font-sans">
       <Header activeView={activeView} onViewChange={setActiveView} learner={currentUser} onLogout={handleLogout} />
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         {activeView !== 'Login' && (
-          <div className="mb-6 flex flex-col gap-1.5 border-b border-white/5 pb-6">
-            <h1 className="text-3xl font-black tracking-tight text-white sm:text-4xl">{activeView}</h1>
+          <div className="">
+            {/* <h1 className="text-3xl font-black tracking-tight text-[#0F172B] sm:text-4xl">{activeView}</h1> */}
           </div>
         )}
         {renderView()}
       </main>
 
-      {celebrationCourse ? (
-        <div className="fixed inset-0 z-50 grid place-items-center bg-slate-950/85 backdrop-blur-md p-4 overflow-hidden">
-          <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
-            {Array.from({ length: 45 }).map((_, i) => {
-              const left = Math.random() * 100
-              const delay = Math.random() * 5
-              const duration = 2.5 + Math.random() * 3
-              const size = 6 + Math.random() * 8
-              const color = ['bg-emerald-400', 'bg-teal-400', 'bg-amber-400', 'bg-rose-400', 'bg-sky-400', 'bg-indigo-400', 'bg-pink-400'][i % 7]
-              const rotation = Math.random() * 360
-              return (
-                <div
-                  key={i}
-                  className={`absolute rounded-xs opacity-75 animate-confetti ${color}`}
-                  style={{
-                    left: `${left}%`,
-                    top: `-20px`,
-                    width: `${size}px`,
-                    height: `${size * (0.6 + Math.random() * 0.8)}px`,
-                    animationDelay: `${delay}s`,
-                    animationDuration: `${duration}s`,
-                    transform: `rotate(${rotation}deg)`,
-                  }}
-                />
-              )
-            })}
-          </div>
-
-          <div className="celebration-pop relative w-full max-w-md rounded-2xl glass-panel bg-slate-900 border border-white/10 p-8 text-center shadow-2xl z-10">
-            <div className="mx-auto grid h-16 w-16 place-items-center rounded-xl bg-emerald-500/10 border border-emerald-500/25 text-2xl text-emerald-400 shadow-md shadow-emerald-500/10">
-              🎉
-            </div>
-            <p className="mt-6 text-[10px] font-black uppercase tracking-wider text-emerald-400">Congratulations</p>
-            <h2 className="mt-1 text-2xl font-black tracking-tight text-white">Course Completed</h2>
-            <p className="mt-2.5 text-xs font-semibold text-slate-400 leading-relaxed">
-              You completed <span className="text-white font-extrabold">{celebrationCourse}</span>. The next course is unlocked now.
-            </p>
-            <button
-              type="button"
-              onClick={() => setCelebrationCourse(null)}
-              className="mt-6 w-full rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 py-3 text-xs font-extrabold uppercase tracking-wider text-white shadow-lg shadow-emerald-500/20 btn-shimmer hover:brightness-110 cursor-pointer"
+      {/* Course Completion Celebration Modal */}
+      <AnimatePresence>
+        {celebrationCourse ? (
+          <div className="fixed inset-0 z-50 grid place-items-center bg-[#0F172B]/60 backdrop-blur-md p-4 overflow-hidden">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.7, y: 30 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.8, y: 20 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 350 }}
+              className="relative w-full max-w-md rounded-3xl border border-[#E2E8F0] bg-white p-8 text-center shadow-2xl space-y-6 overflow-hidden"
             >
-              Continue Learning
-            </button>
-          </div>
-        </div>
-      ) : null}
+              {/* Top Accent Gradient */}
+              <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-[#10B981] via-amber-400 to-[#4F39F6]" />
 
-      <Chatbot />
+              <motion.div
+                animate={{ scale: [1, 1.15, 1], rotate: [0, 8, -8, 0] }}
+                transition={{ repeat: Infinity, duration: 2 }}
+                className="mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-[#EEF0FF] text-3xl text-[#4F39F6] border border-[#4F39F6]/20 shadow-md"
+              >
+                🎉
+              </motion.div>
+              <div className="space-y-1">
+                <span className="text-xs font-black uppercase tracking-widest text-[#4F39F6]">CONGRATULATIONS</span>
+                <h2 className="text-2xl font-black tracking-tight text-[#0F172B]">Course Lessons Completed!</h2>
+                <p className="text-xs font-semibold text-[#334155] leading-relaxed pt-1">
+                  You completed all lessons for <span className="text-[#0F172B] font-extrabold">{celebrationCourse}</span>. The 5-question final quiz is now unlocked!
+                </p>
+              </div>
+
+              <div className="space-y-2.5 pt-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCelebrationCourse(null)
+                    setActiveView('Quizzes')
+                  }}
+                  className="btn-primary btn-shimmer w-full flex items-center justify-center gap-2 py-3.5 text-xs font-extrabold uppercase tracking-wider cursor-pointer shadow-lg shadow-[#4F39F6]/20"
+                >
+                  <HelpCircle className="h-4 w-4" />
+                  <span>Take 5-Question Quiz Now</span>
+                  <ArrowRight className="h-4 w-4" />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setCelebrationCourse(null)}
+                  className="btn-secondary w-full py-3 text-xs font-bold cursor-pointer"
+                >
+                  Close Modal
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        ) : null}
+      </AnimatePresence>
+
+      {/* Chatbot removed as per user request */}
     </div>
   )
 }

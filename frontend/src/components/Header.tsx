@@ -1,57 +1,91 @@
+import { useState } from 'react'
 import type { Learner } from '../types'
+import { Menu, X, LogOut } from 'lucide-react'
 
 type HeaderProps = {
   activeView: string
   onViewChange: (view: string) => void
-  learner: Learner | null
+  learner: { name: string; role: Learner['role'] } | null
   onLogout: () => void
 }
 
-const navItems = ['Home', 'Dashboard', 'Courses', 'Tutorials', 'Lessons', 'Quizzes', 'Certificates', 'Admin']
-
 export function Header({ activeView, onViewChange, learner, onLogout }: HeaderProps) {
-  const visibleNavItems = navItems.filter((item) => {
-    if (!learner) {
-      return ['Home', 'Courses', 'Tutorials'].includes(item)
-    }
-    if (item === 'Admin') {
-      return learner.role === 'Admin'
-    }
-    return true
-  })
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
+  const visibleNavItems = [
+    'Home',
+    'Courses',
+    'Tutorials',
+    'Career Pathway',
+    'Quiz',
+    ...(learner?.role === 'Admin' ? ['Admin Dashboard'] : []),
+  ]
+
+  const handleNavClick = (view: string) => {
+    const targetView = view === 'Quiz' ? 'Quizzes' : view === 'Admin Dashboard' ? 'Admin' : view
+    onViewChange(targetView)
+    setMobileMenuOpen(false)
+  }
 
   return (
-    <header className="sticky top-0 z-30 glass-header">
-      <div className="mx-auto flex max-w-7xl flex-col gap-2 px-4 py-2 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
-        <div className="flex w-full items-center justify-between lg:w-auto">
-          <button
-            className="flex w-fit items-center gap-2 text-left focus:outline-none"
-            type="button"
-            onClick={() => onViewChange('Home')}
-          >
-            <span className="grid h-8 w-8 place-items-center rounded-lg bg-gradient-to-tr from-emerald-600 to-teal-400 text-sm font-black text-white shadow-md shadow-emerald-500/25">
-              L
+    <header className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur-md border-b border-[#E2E8F0] shadow-sm transition-all">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
+        {/* Brand Logo */}
+        <button
+          className="flex items-center gap-3 text-left focus:outline-none group cursor-pointer"
+          type="button"
+          onClick={() => handleNavClick('Home')}
+        >
+          <span className="grid h-10 w-10 place-items-center rounded-xl bg-[#4F39F6] text-lg font-black text-white shadow-md shadow-[#4F39F6]/25 group-hover:bg-[#4338CA] transition-colors">
+            L
+          </span>
+          <span>
+            <span className="block text-xl font-black tracking-tight text-[#0F172B]">
+              Learn<span className="text-[#4F39F6]">Hub</span>
             </span>
-            <span>
-              <span className="block text-base font-black tracking-tight text-white">
-                Learn<span className="text-emerald-400">Hub</span>
-              </span>
-              <span className="block text-[10px] font-medium text-slate-400">Online learning platform</span>
-            </span>
-          </button>
-          
+            <span className="block text-[10px] font-bold text-[#64748B] tracking-wider uppercase">Online learning platform</span>
+          </span>
+        </button>
+
+        {/* Desktop Navigation Links */}
+        <nav className="hidden lg:flex items-center gap-1.5" aria-label="Main navigation">
+          {visibleNavItems.map((item) => {
+            const isActive =
+              activeView === item ||
+              (item === 'Quiz' && activeView === 'Quizzes') ||
+              (item === 'Admin Dashboard' && activeView === 'Admin')
+
+            return (
+              <button
+                key={item}
+                type="button"
+                onClick={() => handleNavClick(item)}
+                className={`rounded-xl px-4 py-2 text-xs font-bold transition-all duration-200 cursor-pointer ${
+                  isActive
+                    ? 'bg-[#4F39F6] text-white shadow-md shadow-[#4F39F6]/20'
+                    : 'text-[#334155] hover:bg-[#EEF0FF] hover:text-[#4F39F6]'
+                }`}
+              >
+                {item}
+              </button>
+            )
+          })}
+        </nav>
+
+        {/* Desktop Auth / User Info */}
+        <div className="hidden lg:flex items-center gap-3">
           {!learner ? (
             <button
               type="button"
-              onClick={() => onViewChange('Login')}
-              className="lg:hidden rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 px-4 py-2 text-xs font-extrabold uppercase tracking-wider text-white shadow shadow-emerald-500/25 btn-shimmer hover:brightness-110"
+              onClick={() => handleNavClick('Login')}
+              className="rounded-xl bg-[#4F39F6] hover:bg-[#4338CA] px-5 py-2.5 text-xs font-extrabold uppercase tracking-wider text-white shadow-md shadow-[#4F39F6]/20 btn-shimmer transition-all cursor-pointer"
             >
-              Sign In
+              Sign In / Register
             </button>
           ) : (
-            <div className="lg:hidden flex items-center gap-2">
-              <div className="flex items-center gap-2 rounded-lg border border-white/5 bg-slate-900/50 px-2.5 py-1">
-                <div className="grid h-7 w-7 place-items-center rounded bg-gradient-to-br from-sky-500 to-blue-600 text-[10px] font-black text-white shadow shadow-sky-500/20">
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2.5 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3.5 py-1.5">
+                <div className="grid h-8 w-8 place-items-center rounded-lg bg-[#4F39F6] text-xs font-black text-white shadow-xs">
                   {learner.name
                     .split(' ')
                     .map((part) => part[0])
@@ -59,71 +93,101 @@ export function Header({ activeView, onViewChange, learner, onLogout }: HeaderPr
                     .slice(0, 2)}
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-slate-100 whitespace-nowrap">{learner.name}</p>
-                  <p className="text-[10px] font-semibold text-slate-400 leading-none">{learner.role}</p>
+                  <p className="text-xs font-black text-[#0F172B] whitespace-nowrap">{learner.name}</p>
+                  <p className="text-[10px] font-extrabold text-[#4F39F6] leading-none">{learner.role}</p>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={onLogout}
-                className="rounded-lg border border-white/10 hover:border-rose-500/30 hover:bg-rose-500/10 px-2.5 py-1.5 text-xs font-bold text-slate-300 hover:text-rose-400 transition-all duration-200"
+                className="flex items-center gap-1.5 rounded-xl border border-[#E2E8F0] hover:border-rose-200 hover:bg-rose-50 px-3.5 py-2 text-xs font-extrabold text-[#334155] hover:text-rose-600 transition-all duration-200 cursor-pointer"
               >
-                Logout
+                <LogOut className="h-3.5 w-3.5" />
+                <span>Logout</span>
               </button>
             </div>
           )}
         </div>
 
-        <nav className="flex flex-wrap gap-1 justify-center lg:justify-start py-1 lg:py-0" aria-label="Main navigation">
-          {visibleNavItems.map((item) => (
-            <button
-              key={item}
-              type="button"
-              onClick={() => onViewChange(item)}
-              className={`shrink-0 rounded-md px-3 py-1 text-xs font-semibold transition-all duration-200 ${
-                activeView === item
-                  ? 'bg-emerald-600 text-white shadow shadow-emerald-500/20'
-                  : 'text-slate-300 hover:bg-white/5 hover:text-white'
-              }`}
-            >
-              {item}
-            </button>
-          ))}
-        </nav>
-
-        {!learner ? (
+        {/* Mobile Hamburger Toggle Button */}
+        <div className="flex lg:hidden items-center gap-2">
           <button
             type="button"
-            onClick={() => onViewChange('Login')}
-            className="hidden lg:block rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 px-4 py-2.5 text-xs font-extrabold uppercase tracking-wider text-white shadow shadow-emerald-500/25 btn-shimmer hover:brightness-110"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="rounded-xl border border-[#E2E8F0] p-2 text-[#334155] hover:bg-[#EEF0FF] hover:text-[#4F39F6] transition-colors cursor-pointer"
+            aria-label="Toggle navigation menu"
           >
-            Sign In / Register
+            {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
-        ) : (
-          <div className="hidden lg:flex items-center gap-3">
-            <div className="flex items-center gap-2 rounded-lg border border-white/5 bg-slate-900/50 px-2.5 py-1">
-              <div className="grid h-7 w-7 place-items-center rounded bg-gradient-to-br from-sky-500 to-blue-600 text-[10px] font-black text-white shadow shadow-sky-500/20">
-                {learner.name
-                  .split(' ')
-                  .map((part) => part[0])
-                  .join('')
-                  .slice(0, 2)}
-              </div>
-              <div>
-                <p className="text-xs font-bold text-slate-100 whitespace-nowrap">{learner.name}</p>
-                <p className="text-[10px] font-semibold text-slate-400 leading-none">{learner.role}</p>
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={onLogout}
-              className="rounded-lg border border-white/10 hover:border-rose-500/30 hover:bg-rose-500/10 px-3 py-1.5 text-xs font-bold text-slate-300 hover:text-rose-400 transition-all duration-200 cursor-pointer"
-            >
-              Logout
-            </button>
-          </div>
-        )}
+        </div>
       </div>
+
+      {/* Mobile Drawer Menu (320px - 768px) */}
+      {mobileMenuOpen && (
+        <div className="lg:hidden border-t border-[#E2E8F0] bg-white px-4 py-4 space-y-3 shadow-lg">
+          <nav className="flex flex-col space-y-1.5">
+            {visibleNavItems.map((item) => {
+              const isActive =
+                activeView === item ||
+                (item === 'Quiz' && activeView === 'Quizzes') ||
+                (item === 'Admin Dashboard' && activeView === 'Admin')
+
+              return (
+                <button
+                  key={item}
+                  type="button"
+                  onClick={() => handleNavClick(item)}
+                  className={`w-full text-left rounded-xl px-4 py-2.5 text-xs font-bold transition-all cursor-pointer ${
+                    isActive
+                      ? 'bg-[#4F39F6] text-white shadow-sm'
+                      : 'text-[#334155] hover:bg-[#EEF0FF] hover:text-[#4F39F6]'
+                  }`}
+                >
+                  {item}
+                </button>
+              )
+            })}
+          </nav>
+
+          <div className="pt-3 border-t border-[#E2E8F0]">
+            {!learner ? (
+              <button
+                type="button"
+                onClick={() => handleNavClick('Login')}
+                className="w-full rounded-xl bg-[#4F39F6] hover:bg-[#4338CA] py-3 text-xs font-extrabold uppercase tracking-wider text-white shadow-md shadow-[#4F39F6]/20 btn-shimmer transition-all cursor-pointer"
+              >
+                Sign In / Register
+              </button>
+            ) : (
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="grid h-8 w-8 place-items-center rounded-lg bg-[#4F39F6] text-xs font-black text-white">
+                    {learner.name
+                      .split(' ')
+                      .map((part) => part[0])
+                      .join('')
+                      .slice(0, 2)}
+                  </div>
+                  <div>
+                    <p className="text-xs font-black text-[#0F172B]">{learner.name}</p>
+                    <p className="text-[10px] font-extrabold text-[#4F39F6]">{learner.role}</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    onLogout()
+                    setMobileMenuOpen(false)
+                  }}
+                  className="rounded-xl border border-[#E2E8F0] hover:bg-rose-50 px-3 py-1.5 text-xs font-bold text-rose-600 transition-colors cursor-pointer"
+                >
+                  Logout
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </header>
   )
 }

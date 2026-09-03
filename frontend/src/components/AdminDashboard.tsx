@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react'
+import { CheckCircle2, Trash2, Search, AlertTriangle } from 'lucide-react'
 import type { AdminStat, Course, CourseLevel, Lesson, QuizQuestion } from '../types'
 import { MetricCard } from './MetricCard'
 
@@ -17,11 +18,23 @@ export function AdminDashboard({
   onEditCourse,
   onDeleteCourse,
 }: AdminDashboardProps) {
-  const tones = ['green', 'blue', 'amber', 'rose'] as const
+  const tones = ['indigo', 'purple', 'amber', 'rose'] as const
+
+  // Toast Notification state
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'danger' } | null>(null)
+
+  const showToast = (message: string, type: 'success' | 'danger' = 'success') => {
+    setToast({ message, type })
+    setTimeout(() => {
+      setToast(null)
+    }, 3500)
+  }
 
   // Modals state
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingCourse, setEditingCourse] = useState<Course | null>(null)
+  const [deletingCourse, setDeletingCourse] = useState<Course | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
   const [activeTab, setActiveTab] = useState<'details' | 'lessons' | 'quiz'>('details')
 
   // Form states
@@ -221,15 +234,51 @@ export function AdminDashboard({
 
     if (editingCourse) {
       onEditCourse(finalCourse)
+      showToast('Course updated successfully', 'success')
     } else {
       onAddCourse(finalCourse)
+      showToast('Course added successfully', 'success')
     }
 
     setIsModalOpen(false)
   }
 
   return (
-    <section className="space-y-6">
+    <section className="space-y-6 relative">
+      {/* Toast Notification Popup */}
+      {toast && (
+        <div className="fixed top-6 right-6 z-50">
+          <div className={`flex items-center gap-3.5 rounded-2xl p-4.5 shadow-2xl border backdrop-blur-md transition-all ${
+            toast.type === 'danger'
+              ? 'bg-[#FEF2F2] border-[#EF4444]/30 text-[#EF4444]'
+              : 'bg-[#ECFDF5] border-[#10B981]/30 text-[#10B981]'
+          }`}>
+            {toast.type === 'danger' ? (
+              <div className="grid h-9 w-9 place-items-center rounded-xl bg-[#EF4444] text-white shadow-sm">
+                <Trash2 className="h-4.5 w-4.5" />
+              </div>
+            ) : (
+              <div className="grid h-9 w-9 place-items-center rounded-xl bg-[#10B981] text-white shadow-sm">
+                <CheckCircle2 className="h-4.5 w-4.5" />
+              </div>
+            )}
+            <div>
+              <p className="text-xs font-black uppercase tracking-wider">
+                {toast.type === 'danger' ? 'Deleted' : 'Success'}
+              </p>
+              <p className="text-xs font-extrabold text-[#0F172B]">{toast.message}</p>
+            </div>
+            <button
+              onClick={() => setToast(null)}
+              className="ml-3 text-[#64748B] hover:text-[#0F172B] text-sm font-black cursor-pointer"
+              type="button"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Metric counters */}
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {dynamicStats.map((stat, index) => (
@@ -243,26 +292,40 @@ export function AdminDashboard({
         ))}
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+      <div className="space-y-6">
         {/* Published Courses list */}
-        <div className="glass-panel rounded-2xl p-6 shadow-md border border-white/5 bg-slate-900/40">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-white/5 pb-4.5">
+        <div className="rounded-3xl bg-white border border-[#E2E8F0] p-6 sm:p-8 shadow-[0_8px_30px_rgba(15,23,42,0.06)]">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-[#E2E8F0] pb-5">
             <div>
-              <p className="text-xs font-black uppercase tracking-wider text-emerald-400">Course management</p>
-              <h2 className="text-xl font-black tracking-tight text-white">Published courses</h2>
+              <p className="text-xs font-black uppercase tracking-wider text-[#4F39F6]">Course management</p>
+              <h2 className="text-xl font-black tracking-tight text-[#0F172B]">Published courses</h2>
             </div>
-            <button
-              onClick={handleAddClick}
-              className="w-fit rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 px-5.5 py-3 text-xs font-extrabold uppercase tracking-wider text-white shadow-lg shadow-emerald-500/20 btn-shimmer hover:brightness-110 cursor-pointer"
-              type="button"
-            >
-              Add course
-            </button>
+            
+            <div className="flex items-center gap-3">
+              <div className="relative flex-1 sm:w-64">
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#64748B]" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search courses..."
+                  className="w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] pl-9 pr-4 py-2 text-xs font-semibold text-[#0F172B] focus:border-[#4F39F6] focus:bg-white outline-none"
+                />
+              </div>
+
+              <button
+                onClick={handleAddClick}
+                className="w-fit rounded-2xl bg-[#4F39F6] hover:bg-[#4338CA] px-5.5 py-2.5 text-xs font-extrabold uppercase tracking-wider text-white shadow-lg shadow-[#4F39F6]/25 btn-shimmer cursor-pointer whitespace-nowrap"
+                type="button"
+              >
+                + Add new course
+              </button>
+            </div>
           </div>
 
-          <div className="mt-5 overflow-x-auto">
+          <div className="mt-6 overflow-x-auto">
             <table className="w-full min-w-[720px] text-left text-xs">
-              <thead className="border-b border-white/5 text-[10px] font-black uppercase tracking-wider text-slate-400">
+              <thead className="border-b border-[#E2E8F0] text-[10px] font-black uppercase tracking-wider text-[#334155]">
                 <tr>
                   <th className="py-3 pr-4">Course</th>
                   <th className="py-3 pr-4">Instructor</th>
@@ -272,44 +335,47 @@ export function AdminDashboard({
                   <th className="py-3 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/5">
-                {courses.map((course) => (
-                  <tr key={course.id} className="hover:bg-white/[0.02] transition-colors duration-200">
+              <tbody className="divide-y divide-[#E2E8F0]">
+                {courses
+                  .filter((c) =>
+                    !searchQuery.trim() ||
+                    c.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    c.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    c.instructor.toLowerCase().includes(searchQuery.toLowerCase())
+                  )
+                  .map((course) => (
+                  <tr key={course.id} className="hover:bg-[#EEF0FF]/40 transition-colors duration-200">
                     <td className="py-4 pr-4">
                       <div className="flex items-center gap-3">
-                        <img className="h-10 w-14 rounded-lg object-cover border border-white/10" src={course.image} alt="" />
+                        <img className="h-10 w-14 rounded-lg object-cover border border-[#E2E8F0]" src={course.image} alt="" />
                         <div>
-                          <p className="font-bold text-slate-100 text-sm leading-snug">{course.title}</p>
-                          <p className="text-[10px] font-medium text-slate-400">{course.duration}</p>
+                          <p className="font-black text-[#0F172B] text-sm leading-snug">{course.title}</p>
+                          <p className="text-[10px] font-bold text-[#64748B]">{course.duration}</p>
                         </div>
                       </div>
                     </td>
-                    <td className="py-4 pr-4 text-slate-400 font-semibold">{course.instructor}</td>
-                    <td className="py-4 pr-4 text-slate-400 font-semibold">{course.students.toLocaleString()}</td>
-                    <td className="py-4 pr-4 text-slate-400 font-semibold">
-                      <span className="block">{course.category}</span>
-                      <span className="text-[10px] font-bold text-sky-400">{course.level}</span>
+                    <td className="py-4 pr-4 text-[#334155] font-bold">{course.instructor}</td>
+                    <td className="py-4 pr-4 text-[#334155] font-bold">{course.students.toLocaleString()}</td>
+                    <td className="py-4 pr-4 text-[#334155] font-bold">
+                      <span className="block font-black text-[#0F172B]">{course.category}</span>
+                      <span className="text-[10px] font-extrabold text-[#4F39F6]">{course.level}</span>
                     </td>
-                    <td className="py-4 pr-4 text-slate-400 font-semibold">
-                      <span className="block font-extrabold text-emerald-400">{course.lessons?.length || 0} Lessons</span>
-                      <span className="text-[10px] text-slate-500">{course.quiz?.length || 0} Qs Quiz</span>
+                    <td className="py-4 pr-4 text-[#334155] font-bold">
+                      <span className="block font-black text-[#4F39F6]">{course.lessons?.length || 0} Lessons</span>
+                      <span className="text-[10px] text-[#64748B] font-semibold">{course.quiz?.length || 0} Qs Quiz</span>
                     </td>
                     <td className="py-4 text-right">
                       <div className="flex items-center justify-end gap-2">
                         <button
                           onClick={() => handleEditClick(course)}
-                          className="rounded-lg border border-white/10 hover:border-emerald-500/30 hover:bg-emerald-500/10 px-2.5 py-1.5 text-xs font-bold text-slate-300 hover:text-emerald-400 transition-all duration-200 cursor-pointer"
+                          className="rounded-xl border border-[#E2E8F0] hover:border-[#4F39F6] hover:bg-[#EEF0FF] px-3 py-1.5 text-xs font-bold text-[#334155] hover:text-[#4F39F6] transition-all duration-200 cursor-pointer"
                           type="button"
                         >
                           Edit
                         </button>
                         <button
-                          onClick={() => {
-                            if (confirm(`Are you sure you want to delete "${course.title}"?`)) {
-                              onDeleteCourse(course.id)
-                            }
-                          }}
-                          className="rounded-lg border border-white/10 hover:border-rose-500/30 hover:bg-rose-500/10 px-2.5 py-1.5 text-xs font-bold text-slate-300 hover:text-rose-400 transition-all duration-200 cursor-pointer"
+                          onClick={() => setDeletingCourse(course)}
+                          className="rounded-xl border border-[#E2E8F0] hover:border-rose-300 hover:bg-rose-50 px-3 py-1.5 text-xs font-bold text-[#334155] hover:text-rose-600 transition-all duration-200 cursor-pointer"
                           type="button"
                         >
                           Delete
@@ -322,46 +388,32 @@ export function AdminDashboard({
             </table>
           </div>
         </div>
-
-        {/* Moderation Queue */}
-        <div className="glass-panel rounded-2xl p-6 shadow-md border border-white/5 bg-slate-900/40">
-          <p className="text-xs font-black uppercase tracking-wider text-sky-400">Admin tools</p>
-          <h2 className="mt-1 text-xl font-black tracking-tight text-white">Moderation queue</h2>
-          <div className="mt-5 space-y-3">
-            {['Review new tutorial draft', 'Approve instructor profile', 'Verify certificate request'].map((task, index) => (
-              <label key={task} className="flex items-center gap-3.5 rounded-xl border border-white/5 bg-slate-900/30 p-4.5 font-bold text-slate-300 hover:bg-slate-900/60 transition-colors duration-200 cursor-pointer">
-                <input className="h-4.5 w-4.5 rounded accent-emerald-500 border-white/10" type="checkbox" defaultChecked={index === 2} />
-                <span className="text-xs font-semibold text-slate-200">{task}</span>
-              </label>
-            ))}
-          </div>
-        </div>
       </div>
 
-      {/* Sleek Add/Edit Modal */}
+      {/* Sleek Light Add/Edit Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 grid place-items-center bg-slate-950/80 backdrop-blur-sm p-4 overflow-y-auto">
-          <div className="w-full max-w-2xl rounded-2xl border border-white/10 bg-slate-900/95 p-6 shadow-2xl relative my-8">
+        <div className="fixed inset-0 z-50 grid place-items-center bg-slate-950/40 backdrop-blur-sm p-4 overflow-y-auto">
+          <div className="w-full max-w-2xl rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 shadow-2xl relative my-8">
             <button
               onClick={() => setIsModalOpen(false)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-white font-extrabold text-lg cursor-pointer"
+              className="absolute top-5 right-5 text-slate-400 hover:text-slate-700 font-extrabold text-lg cursor-pointer"
               type="button"
             >
               ✕
             </button>
 
             <div className="mb-6">
-              <span className="rounded-lg bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 text-xs font-black tracking-wider uppercase text-emerald-400">
+              <span className="rounded-lg bg-indigo-50 border border-indigo-100 px-3 py-1.5 text-xs font-black tracking-wider uppercase text-indigo-600">
                 {editingCourse ? 'Modify Course' : 'Create Course'}
               </span>
               <div className="flex items-center justify-between mt-2">
-                <h3 className="text-2xl font-black text-white">
+                <h3 className="text-2xl font-black text-slate-900">
                   {editingCourse ? 'Edit Course Details' : 'Add New Course'}
                 </h3>
                 {!editingCourse && (
                   <button
                     onClick={handleLoadDemo}
-                    className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/20 px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-emerald-400 transition cursor-pointer"
+                    className="rounded-xl border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-indigo-600 transition cursor-pointer"
                     type="button"
                   >
                     ⚡ Load Demo Preset
@@ -371,7 +423,7 @@ export function AdminDashboard({
             </div>
 
             {/* Modal Tabs */}
-            <div className="flex border-b border-white/5 mb-6 gap-2">
+            <div className="flex border-b border-slate-200 mb-6 gap-2">
               {[
                 { id: 'details', label: '1. General Details' },
                 { id: 'lessons', label: `2. Lessons (${lessons.length})` },
@@ -380,10 +432,10 @@ export function AdminDashboard({
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as any)}
-                  className={`pb-3 px-1 text-xs font-black uppercase tracking-wider transition-all duration-200 cursor-pointer ${
+                  className={`pb-3 px-2 text-xs font-black uppercase tracking-wider transition-all duration-200 cursor-pointer ${
                     activeTab === tab.id
-                      ? 'border-b-2 border-emerald-500 text-white'
-                      : 'text-slate-400 hover:text-white'
+                      ? 'border-b-2 border-indigo-600 text-indigo-600'
+                      : 'text-slate-400 hover:text-slate-700'
                   }`}
                   type="button"
                 >
@@ -397,7 +449,7 @@ export function AdminDashboard({
               {activeTab === 'details' && (
                 <div className="grid gap-4 sm:grid-cols-2 max-h-[50vh] overflow-y-auto pr-1">
                   <div className="sm:col-span-2">
-                    <label className="block text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1">
+                    <label className="block text-[10px] font-black uppercase tracking-wider text-slate-500 mb-1">
                       Course Title *
                     </label>
                     <input
@@ -406,12 +458,12 @@ export function AdminDashboard({
                       value={title}
                       onChange={(e) => setTitle(e.target.value)}
                       placeholder="e.g. Advanced TypeScript Patterns"
-                      className="w-full rounded-xl border border-white/5 bg-slate-950/40 px-4 py-3 text-xs font-semibold text-slate-200 outline-none transition focus:border-emerald-500"
+                      className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-xs font-semibold text-slate-900 outline-none transition focus:border-indigo-600 focus:bg-white"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1">
+                    <label className="block text-[10px] font-black uppercase tracking-wider text-slate-500 mb-1">
                       Instructor Name
                     </label>
                     <input
@@ -419,12 +471,12 @@ export function AdminDashboard({
                       value={instructor}
                       onChange={(e) => setInstructor(e.target.value)}
                       placeholder="e.g. Dr. Jane Doe"
-                      className="w-full rounded-xl border border-white/5 bg-slate-950/40 px-4 py-3 text-xs font-semibold text-slate-200 outline-none transition focus:border-emerald-500"
+                      className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-xs font-semibold text-slate-900 outline-none transition focus:border-indigo-600 focus:bg-white"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1">
+                    <label className="block text-[10px] font-black uppercase tracking-wider text-slate-500 mb-1">
                       Category
                     </label>
                     <input
@@ -432,18 +484,18 @@ export function AdminDashboard({
                       value={category}
                       onChange={(e) => setCategory(e.target.value)}
                       placeholder="e.g. Web Development"
-                      className="w-full rounded-xl border border-white/5 bg-slate-950/40 px-4 py-3 text-xs font-semibold text-slate-200 outline-none transition focus:border-emerald-500"
+                      className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-xs font-semibold text-slate-900 outline-none transition focus:border-indigo-600 focus:bg-white"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1">
+                    <label className="block text-[10px] font-black uppercase tracking-wider text-slate-500 mb-1">
                       Level
                     </label>
                     <select
                       value={level}
                       onChange={(e) => setLevel(e.target.value as CourseLevel)}
-                      className="w-full rounded-xl border border-white/5 bg-slate-950/40 px-4 py-3 text-xs font-semibold text-slate-200 outline-none transition focus:border-emerald-500"
+                      className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-xs font-semibold text-slate-900 outline-none transition focus:border-indigo-600 focus:bg-white"
                     >
                       <option value="Beginner">Beginner</option>
                       <option value="Intermediate">Intermediate</option>
@@ -452,7 +504,7 @@ export function AdminDashboard({
                   </div>
 
                   <div>
-                    <label className="block text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1">
+                    <label className="block text-[10px] font-black uppercase tracking-wider text-slate-500 mb-1">
                       Duration
                     </label>
                     <input
@@ -460,12 +512,12 @@ export function AdminDashboard({
                       value={duration}
                       onChange={(e) => setDuration(e.target.value)}
                       placeholder="e.g. 5h 30m"
-                      className="w-full rounded-xl border border-white/5 bg-slate-950/40 px-4 py-3 text-xs font-semibold text-slate-200 outline-none transition focus:border-emerald-500"
+                      className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-xs font-semibold text-slate-900 outline-none transition focus:border-indigo-600 focus:bg-white"
                     />
                   </div>
 
                   <div className="sm:col-span-2">
-                    <label className="block text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1">
+                    <label className="block text-[10px] font-black uppercase tracking-wider text-slate-500 mb-1">
                       Banner Image
                     </label>
                     <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
@@ -473,7 +525,7 @@ export function AdminDashboard({
                         <img 
                           src={image} 
                           alt="Banner Preview" 
-                          className="h-12 w-20 rounded-lg object-cover border border-white/10"
+                          className="h-12 w-20 rounded-lg object-cover border border-slate-200"
                         />
                       )}
                       <div className="flex-1 flex gap-3 w-full">
@@ -482,9 +534,9 @@ export function AdminDashboard({
                           value={image}
                           onChange={(e) => setImage(e.target.value)}
                           placeholder="Paste image URL or upload file..."
-                          className="flex-1 min-w-0 rounded-xl border border-white/5 bg-slate-950/40 px-4 py-3 text-xs font-semibold text-slate-200 outline-none transition focus:border-emerald-500"
+                          className="flex-1 min-w-0 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-xs font-semibold text-slate-900 outline-none transition focus:border-indigo-600 focus:bg-white"
                         />
-                        <label className="shrink-0 rounded-xl border border-white/10 hover:border-emerald-500/30 hover:bg-emerald-500/10 px-4 py-3 text-xs font-extrabold uppercase tracking-wider text-slate-300 hover:text-emerald-400 transition duration-200 cursor-pointer text-center whitespace-nowrap">
+                        <label className="shrink-0 rounded-xl border border-slate-200 hover:border-indigo-300 hover:bg-indigo-50 px-4 py-3 text-xs font-extrabold uppercase tracking-wider text-slate-700 hover:text-indigo-600 transition duration-200 cursor-pointer text-center whitespace-nowrap">
                           Upload File
                           <input
                             type="file"
@@ -498,7 +550,7 @@ export function AdminDashboard({
                   </div>
 
                   <div className="sm:col-span-2">
-                    <label className="block text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1">
+                    <label className="block text-[10px] font-black uppercase tracking-wider text-slate-500 mb-1">
                       Short Summary *
                     </label>
                     <textarea
@@ -507,7 +559,7 @@ export function AdminDashboard({
                       onChange={(e) => setSummary(e.target.value)}
                       placeholder="Give a brief summary of the path objectives..."
                       rows={3}
-                      className="w-full rounded-xl border border-white/5 bg-slate-950/40 px-4 py-3 text-xs font-semibold text-slate-200 outline-none transition focus:border-emerald-500 resize-none"
+                      className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-xs font-semibold text-slate-900 outline-none transition focus:border-indigo-600 focus:bg-white resize-none"
                     />
                   </div>
                 </div>
@@ -518,12 +570,12 @@ export function AdminDashboard({
                 <div className="space-y-4">
                   <div className="max-h-[45vh] overflow-y-auto space-y-3.5 pr-1">
                     {lessons.length === 0 ? (
-                      <p className="text-xs text-slate-500 py-4 text-center">No lessons added. Click below to add one.</p>
+                      <p className="text-xs text-slate-400 py-4 text-center">No lessons added. Click below to add one.</p>
                     ) : (
                       lessons.map((lesson, index) => (
                         <div
                           key={lesson.id}
-                          className="p-4 rounded-xl border border-white/5 bg-slate-950/30 flex flex-col gap-3"
+                          className="p-4 rounded-2xl border border-slate-200 bg-slate-50 flex flex-col gap-3"
                         >
                           <div className="grid gap-3 sm:grid-cols-[1.5fr_1fr_1fr_auto] items-end">
                             <div>
@@ -536,7 +588,7 @@ export function AdminDashboard({
                                 value={lesson.title}
                                 onChange={(e) => updateLessonField(index, 'title', e.target.value)}
                                 placeholder="e.g. Type Casting basics"
-                                className="w-full rounded-lg border border-white/5 bg-slate-900/60 px-3 py-2 text-xs font-semibold text-slate-200 outline-none focus:border-emerald-500"
+                                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-900 outline-none focus:border-indigo-600"
                               />
                             </div>
                             <div>
@@ -549,7 +601,7 @@ export function AdminDashboard({
                                 value={lesson.duration}
                                 onChange={(e) => updateLessonField(index, 'duration', e.target.value)}
                                 placeholder="e.g. 15 min"
-                                className="w-full rounded-lg border border-white/5 bg-slate-900/60 px-3 py-2 text-xs font-semibold text-slate-200 outline-none focus:border-emerald-500"
+                                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-900 outline-none focus:border-indigo-600"
                               />
                             </div>
                             <div>
@@ -559,7 +611,7 @@ export function AdminDashboard({
                               <select
                                 value={lesson.type}
                                 onChange={(e) => updateLessonField(index, 'type', e.target.value)}
-                                className="w-full rounded-lg border border-white/5 bg-slate-900/60 px-3 py-2 text-xs font-semibold text-slate-200 outline-none focus:border-emerald-500"
+                                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-900 outline-none focus:border-indigo-600"
                               >
                                 <option value="video">Video Lesson</option>
                                 <option value="reading">Reading Resource</option>
@@ -568,7 +620,7 @@ export function AdminDashboard({
                             </div>
                             <button
                               onClick={() => removeLessonRow(index)}
-                              className="rounded-lg border border-white/5 bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 px-3 py-2 text-xs font-bold transition cursor-pointer"
+                              className="rounded-lg border border-rose-200 bg-rose-50 text-rose-600 hover:bg-rose-100 px-3 py-2 text-xs font-bold transition cursor-pointer"
                               type="button"
                             >
                               Remove
@@ -586,7 +638,7 @@ export function AdminDashboard({
                                 value={lesson.youtubeId || ''}
                                 onChange={(e) => updateLessonField(index, 'youtubeId', e.target.value)}
                                 placeholder="e.g. Ke90Tje7VS0"
-                                className="w-full rounded-lg border border-white/5 bg-slate-900/60 px-3 py-2 text-xs font-semibold text-slate-200 outline-none focus:border-emerald-500"
+                                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-900 outline-none focus:border-indigo-600"
                               />
                             </div>
                           )}
@@ -601,7 +653,7 @@ export function AdminDashboard({
                                 onChange={(e) => updateLessonField(index, 'content', e.target.value)}
                                 placeholder="Write lesson markdown/text content..."
                                 rows={4}
-                                className="w-full rounded-lg border border-white/5 bg-slate-900/60 px-3 py-2 text-xs font-semibold text-slate-200 outline-none focus:border-emerald-500 resize-none"
+                                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-900 outline-none focus:border-indigo-600 resize-none"
                               />
                             </div>
                           )}
@@ -611,7 +663,7 @@ export function AdminDashboard({
                   </div>
                   <button
                     onClick={addLessonRow}
-                    className="w-full rounded-xl border border-dashed border-white/10 hover:border-emerald-500/50 hover:bg-emerald-500/5 py-3 text-xs font-bold text-slate-300 hover:text-emerald-400 transition cursor-pointer"
+                    className="w-full rounded-2xl border border-dashed border-slate-300 hover:border-indigo-500 hover:bg-indigo-50/50 py-3 text-xs font-bold text-slate-600 hover:text-indigo-600 transition cursor-pointer"
                     type="button"
                   >
                     + Add Lesson Item
@@ -624,20 +676,20 @@ export function AdminDashboard({
                 <div className="space-y-4">
                   <div className="max-h-[45vh] overflow-y-auto space-y-4 pr-1">
                     {quizQuestions.length === 0 ? (
-                      <p className="text-xs text-slate-500 py-4 text-center">No quiz questions added. Click below to add one.</p>
+                      <p className="text-xs text-slate-400 py-4 text-center">No quiz questions added. Click below to add one.</p>
                     ) : (
                       quizQuestions.map((q, qIndex) => (
                         <div
                           key={q.id}
-                          className="p-4 rounded-xl border border-white/5 bg-slate-950/30 space-y-3"
+                          className="p-4 rounded-2xl border border-slate-200 bg-slate-50 space-y-3"
                         >
                           <div className="flex items-center justify-between">
-                            <span className="text-[10px] font-black text-emerald-400 uppercase tracking-wider">
+                            <span className="text-[10px] font-black text-indigo-600 uppercase tracking-wider">
                               Question {qIndex + 1}
                             </span>
                             <button
                               onClick={() => removeQuizQuestionRow(qIndex)}
-                              className="rounded-lg border border-white/5 bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 px-2 py-1 text-[10px] font-bold transition cursor-pointer"
+                              className="rounded-lg border border-rose-200 bg-rose-50 text-rose-600 hover:bg-rose-100 px-2 py-1 text-[10px] font-bold transition cursor-pointer"
                               type="button"
                             >
                               Remove
@@ -654,7 +706,7 @@ export function AdminDashboard({
                               value={q.question}
                               onChange={(e) => updateQuizField(qIndex, 'question', e.target.value)}
                               placeholder="e.g. What is React memo used for?"
-                              className="w-full rounded-lg border border-white/5 bg-slate-900/60 px-3 py-2 text-xs font-semibold text-slate-200 outline-none focus:border-emerald-500"
+                              className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-900 outline-none focus:border-indigo-600"
                             />
                           </div>
 
@@ -670,7 +722,7 @@ export function AdminDashboard({
                                   value={choice}
                                   onChange={(e) => updateQuizField(qIndex, 'choices', e.target.value, choiceIdx)}
                                   placeholder={`Choice Option ${choiceIdx + 1}`}
-                                  className="w-full rounded-lg border border-white/5 bg-slate-900/60 px-3 py-2 text-xs font-semibold text-slate-200 outline-none focus:border-emerald-500"
+                                  className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-900 outline-none focus:border-indigo-600"
                                 />
                               </div>
                             ))}
@@ -683,7 +735,7 @@ export function AdminDashboard({
                             <select
                               value={q.answer}
                               onChange={(e) => updateQuizField(qIndex, 'answer', e.target.value)}
-                              className="w-full rounded-lg border border-white/5 bg-slate-900/60 px-3 py-2 text-xs font-semibold text-slate-200 outline-none focus:border-emerald-500"
+                              className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-900 outline-none focus:border-indigo-600"
                             >
                               <option value="">Select correct option answer</option>
                               {q.choices.map((choice, cIndex) => (
@@ -699,7 +751,7 @@ export function AdminDashboard({
                   </div>
                   <button
                     onClick={addQuizQuestionRow}
-                    className="w-full rounded-xl border border-dashed border-white/10 hover:border-emerald-500/50 hover:bg-emerald-500/5 py-3 text-xs font-bold text-slate-300 hover:text-emerald-400 transition cursor-pointer"
+                    className="w-full rounded-2xl border border-dashed border-slate-300 hover:border-indigo-500 hover:bg-indigo-50/50 py-3 text-xs font-bold text-slate-600 hover:text-indigo-600 transition cursor-pointer"
                     type="button"
                   >
                     + Add Quiz Question
@@ -708,22 +760,61 @@ export function AdminDashboard({
               )}
 
               {/* Form Buttons */}
-              <div className="flex items-center justify-end gap-3 pt-4 border-t border-white/5 mt-6">
+              <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100 mt-6">
                 <button
                   onClick={() => setIsModalOpen(false)}
-                  className="rounded-xl border border-white/10 px-5.5 py-3 text-xs font-extrabold uppercase tracking-wider text-slate-300 hover:bg-white/5 transition cursor-pointer"
+                  className="rounded-2xl border border-slate-200 px-5.5 py-3 text-xs font-extrabold uppercase tracking-wider text-slate-600 hover:bg-slate-50 transition cursor-pointer"
                   type="button"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 px-5.5 py-3 text-xs font-extrabold uppercase tracking-wider text-white shadow-lg shadow-emerald-500/20 btn-shimmer hover:brightness-110 cursor-pointer"
+                  className="rounded-2xl bg-indigo-600 hover:bg-indigo-700 px-5.5 py-3 text-xs font-extrabold uppercase tracking-wider text-white shadow-lg shadow-indigo-500/25 btn-shimmer cursor-pointer"
                 >
                   Save Course
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Custom Delete Confirmation Modal */}
+      {deletingCourse && (
+        <div className="fixed inset-0 z-50 grid place-items-center bg-[#0F172B]/40 backdrop-blur-sm p-4 animate-fade-in">
+          <div className="brand-card bg-white border border-[#E2E8F0] p-6 sm:p-8 text-center shadow-2xl space-y-5 max-w-md w-full rounded-3xl">
+            <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-[#FEF2F2] border border-[#EF4444]/30 text-[#EF4444] shadow-sm">
+              <AlertTriangle className="h-7 w-7" />
+            </div>
+
+            <div className="space-y-1.5">
+              <h3 className="text-xl font-black text-[#0F172B]">Delete Course</h3>
+              <p className="text-xs text-[#334155] font-semibold leading-relaxed">
+                Are you sure you want to delete <span className="font-extrabold text-[#0F172B]">"{deletingCourse.title}"</span>? This action cannot be undone.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setDeletingCourse(null)}
+                className="btn-secondary flex-1 py-3 text-xs font-extrabold cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  onDeleteCourse(deletingCourse.id)
+                  showToast('Course deleted successfully', 'danger')
+                  setDeletingCourse(null)
+                }}
+                className="flex-1 rounded-2xl bg-[#EF4444] hover:bg-rose-700 text-white py-3 text-xs font-extrabold uppercase tracking-wider transition-colors cursor-pointer shadow-md shadow-rose-500/20"
+              >
+                Confirm Delete
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -91,33 +91,33 @@ export function Login({ onLogin }: LoginProps) {
 
   return (
     <div className="min-h-[80vh] flex flex-col justify-center items-center px-4 py-8">
-      <div className="w-full max-w-md rounded-2xl glass-panel bg-slate-900/60 border border-white/10 p-8 shadow-2xl relative overflow-hidden">
-        {/* Decorative corner glows */}
-        <div className="absolute -top-10 -left-10 w-24 h-24 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none" />
-        <div className="absolute -bottom-10 -right-10 w-24 h-24 bg-sky-500/10 rounded-full blur-2xl pointer-events-none" />
-
-        <div className="text-center mb-8">
-          <span className="inline-grid h-12 w-12 place-items-center rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-400 text-xl font-black text-white shadow-lg shadow-emerald-500/25">
+      <div className="brand-card w-full max-w-md bg-white border border-[#E2E8F0] p-8 sm:p-10 shadow-2xl relative overflow-hidden space-y-6">
+        
+        {/* Header Logo & Title */}
+        <div className="text-center space-y-3">
+          <span className="inline-grid h-12 w-12 place-items-center rounded-2xl bg-[#4F39F6] text-xl font-black text-white shadow-md shadow-[#4F39F6]/25">
             L
           </span>
-          <h2 className="mt-4 text-3xl font-black tracking-tight text-white">
-            {isSignUp ? 'Create Account' : 'Welcome back'}
-          </h2>
-          <p className="mt-2 text-xs font-semibold text-slate-400">
-            {isSignUp ? 'Register to start earning certificates' : 'Sign in to access your dashboard and courses'}
-          </p>
+          <div>
+            <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-[#0F172B]">
+              {isSignUp ? 'Create Account' : 'Welcome back'}
+            </h2>
+            <p className="mt-1 text-xs font-semibold text-[#334155]">
+              {isSignUp ? 'Register to start earning certificates' : 'Sign in to access your dashboard and courses'}
+            </p>
+          </div>
         </div>
 
         {error && (
-          <div className="mb-5 rounded-xl border border-rose-500/25 bg-rose-500/10 p-3.5 text-xs font-semibold text-rose-400">
+          <div className="rounded-2xl border border-[#EF4444]/30 bg-[#FEF2F2] p-4 text-xs font-bold text-[#EF4444]">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4.5">
+        <form onSubmit={handleSubmit} className="space-y-4">
           {isSignUp && (
-            <div>
-              <label className="block text-xs font-extrabold uppercase tracking-wider text-slate-400 mb-1.5" htmlFor="fullname">
+            <div className="space-y-1.5">
+              <label className="block text-xs font-black uppercase tracking-wider text-[#334155]" htmlFor="fullname">
                 Full Name
               </label>
               <input
@@ -130,13 +130,13 @@ export function Login({ onLogin }: LoginProps) {
                   setError('')
                 }}
                 placeholder="e.g. Jane Doe"
-                className="w-full rounded-xl border border-white/5 bg-slate-950/40 px-4 py-3 text-xs font-semibold text-slate-200 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/25 placeholder:text-slate-600"
+                className="w-full brand-input"
               />
             </div>
           )}
 
-          <div>
-            <label className="block text-xs font-extrabold uppercase tracking-wider text-slate-400 mb-1.5" htmlFor="email">
+          <div className="space-y-1.5">
+            <label className="block text-xs font-black uppercase tracking-wider text-[#334155]" htmlFor="email">
               Email Address
             </label>
             <input
@@ -149,12 +149,12 @@ export function Login({ onLogin }: LoginProps) {
                 setError('')
               }}
               placeholder={isSignUp ? 'e.g. jane@example.com' : 'e.g. admin@learnhub.edu or student@learnhub.edu'}
-              className="w-full rounded-xl border border-white/5 bg-slate-950/40 px-4 py-3 text-xs font-semibold text-slate-200 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/25 placeholder:text-slate-600"
+              className="w-full brand-input"
             />
           </div>
 
-          <div>
-            <label className="block text-xs font-extrabold uppercase tracking-wider text-slate-400 mb-1.5" htmlFor="password">
+          <div className="space-y-1.5">
+            <label className="block text-xs font-black uppercase tracking-wider text-[#334155]" htmlFor="password">
               Password
             </label>
             <input
@@ -164,34 +164,34 @@ export function Login({ onLogin }: LoginProps) {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              className="w-full rounded-xl border border-white/5 bg-slate-950/40 px-4 py-3 text-xs font-semibold text-slate-200 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/25 placeholder:text-slate-700"
+              className="w-full brand-input"
             />
           </div>
 
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 py-3.5 text-xs font-extrabold uppercase tracking-wider text-white shadow-lg shadow-emerald-500/20 btn-shimmer hover:brightness-110 mt-6 cursor-pointer disabled:opacity-50"
+            className="btn-primary btn-shimmer w-full py-3.5 text-xs font-extrabold uppercase tracking-wider mt-4 cursor-pointer disabled:opacity-50"
           >
             {isLoading ? 'Processing...' : (isSignUp ? 'Register & Start' : 'Sign In')}
           </button>
         </form>
 
-        <div className="mt-5 text-center">
+        <div className="text-center pt-1">
           <button
             type="button"
             onClick={() => {
               setIsSignUp(!isSignUp)
               setError('')
             }}
-            className="text-xs font-bold text-slate-400 hover:text-emerald-400 transition cursor-pointer"
+            className="text-xs font-extrabold text-[#4F39F6] hover:text-[#4338CA] transition-colors cursor-pointer"
           >
             {isSignUp ? 'Already have an account? Sign In' : "Don't have an account? Register"}
           </button>
         </div>
 
-        <div className="mt-8 pt-6 border-t border-white/5 text-center">
-          <p className="text-[10px] font-black uppercase tracking-wider text-slate-500 mb-3.5">
+        <div className="pt-6 border-t border-[#E2E8F0] text-center space-y-3">
+          <p className="text-[10px] font-black uppercase tracking-wider text-[#64748B]">
             Quick Connect (Testing Profiles)
           </p>
           <div className="grid grid-cols-2 gap-3">
@@ -199,7 +199,7 @@ export function Login({ onLogin }: LoginProps) {
               type="button"
               onClick={() => handlePresetLogin('Admin')}
               disabled={isLoading}
-              className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 hover:bg-emerald-500/10 px-4 py-3 text-xs font-bold text-emerald-400 transition duration-300 cursor-pointer disabled:opacity-50"
+              className="btn-secondary py-3 text-xs font-extrabold cursor-pointer disabled:opacity-50"
             >
               Demo Admin
             </button>
@@ -207,7 +207,7 @@ export function Login({ onLogin }: LoginProps) {
               type="button"
               onClick={() => handlePresetLogin('Student')}
               disabled={isLoading}
-              className="rounded-xl border border-sky-500/20 bg-sky-500/5 hover:bg-sky-500/10 px-4 py-3 text-xs font-bold text-sky-400 transition duration-300 cursor-pointer disabled:opacity-50"
+              className="btn-secondary py-3 text-xs font-extrabold cursor-pointer disabled:opacity-50"
             >
               Demo Student
             </button>
@@ -217,4 +217,3 @@ export function Login({ onLogin }: LoginProps) {
     </div>
   )
 }
-

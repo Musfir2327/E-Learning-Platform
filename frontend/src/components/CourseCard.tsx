@@ -1,4 +1,5 @@
 import type { Course } from '../types'
+import { Star } from 'lucide-react'
 
 type CourseCardProps = {
   course: Course
@@ -11,44 +12,45 @@ type CourseCardProps = {
 export function CourseCard({ course, isSelected, isLocked, isCompleted, onSelect }: CourseCardProps) {
   return (
     <article
-      className={`premium-card group overflow-hidden rounded-2xl flex flex-col justify-between transition-all duration-300 ${
-        isSelected ? 'ring-2 ring-emerald-500/40 border-emerald-500/40 bg-slate-900/60 shadow-lg shadow-emerald-950/20' : 'bg-slate-900/40 shadow-sm'
+      className={`group overflow-hidden rounded-3xl flex flex-col justify-between transition-all duration-300 bg-white border border-[#E2E8F0] ${
+        isSelected ? 'ring-2 ring-[#4F39F6] border-[#4F39F6] shadow-xl' : 'shadow-[0_8px_30px_rgba(15,23,42,0.06)] hover:shadow-xl hover:-translate-y-1'
       }`}
     >
-      <div className="relative overflow-hidden aspect-video w-full border-b border-white/5">
+      <div className="relative overflow-hidden aspect-video w-full border-b border-[#E2E8F0]">
         <img className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" src={course.image} alt="" />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent" />
-      </div>
-      
-      <div className="flex flex-col flex-1 p-5.5 space-y-4">
-        <div className="flex flex-wrap items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-wider">
-          <span className="rounded-md bg-slate-800/80 px-2 py-0.5 text-slate-300 border border-slate-700/50">{course.category}</span>
-          <span className="rounded-md bg-amber-500/10 px-2 py-0.5 text-amber-400 border border-amber-500/20">{course.level}</span>
+        <div className="absolute top-3 left-3 flex flex-wrap gap-1.5 text-[10px] font-black uppercase tracking-wider">
+          <span className="rounded-lg bg-[#4F39F6] px-2.5 py-1 text-white shadow-sm">{course.category}</span>
+          <span className="rounded-lg bg-[#FFFBEB] text-[#F59E0B] border border-[#F59E0B]/20 px-2.5 py-1 font-bold">{course.level}</span>
           {isCompleted ? (
-            <span className="rounded-md bg-emerald-500/10 px-2 py-0.5 text-emerald-400 border border-emerald-500/25">Completed</span>
+            <span className="rounded-lg bg-[#ECFDF5] text-[#10B981] border border-[#10B981]/20 px-2.5 py-1 font-bold">Completed</span>
           ) : null}
           {isLocked ? (
-            <span className="rounded-md bg-rose-500/10 px-2 py-0.5 text-rose-400 border border-rose-500/25">Locked</span>
+            <span className="rounded-lg bg-[#FEF2F2] text-[#EF4444] border border-[#EF4444]/20 px-2.5 py-1 font-bold">Locked</span>
           ) : null}
         </div>
-        
+      </div>
+      
+      <div className="flex flex-col flex-1 p-5 space-y-4">
         <div className="space-y-1.5 flex-1">
-          <h3 className="text-lg font-black tracking-tight text-white transition-colors duration-200 group-hover:text-emerald-400">{course.title}</h3>
-          <p className="text-xs leading-relaxed text-slate-400 font-medium line-clamp-2">{course.summary}</p>
+          <h3 className="text-base font-black tracking-tight text-[#0F172B] transition-colors duration-200 group-hover:text-[#4F39F6]">{course.title}</h3>
+          <p className="text-xs leading-relaxed text-[#334155] font-semibold line-clamp-2">{course.summary}</p>
         </div>
         
-        <div className="flex items-center justify-between text-xs font-semibold text-slate-400">
-          <span>{course.instructor}</span>
-          <span className="text-amber-400 flex items-center gap-1">★ {course.rating.toFixed(1)}</span>
+        <div className="flex items-center justify-between text-xs font-bold text-[#334155] pt-2 border-t border-[#E2E8F0]">
+          <span>By {course.instructor}</span>
+          <span className="text-[#FE9A00] font-black flex items-center gap-1">
+            <Star className="h-3.5 w-3.5 fill-current" />
+            {course.rating.toFixed(1)}
+          </span>
         </div>
         
         <div className="space-y-1.5">
-          <div className="flex justify-between text-[11px] font-bold text-slate-400">
+          <div className="flex justify-between text-[11px] font-extrabold text-[#334155]">
             <span>Course Progress</span>
-            <span className="text-emerald-400">{course.progress}%</span>
+            <span className="text-[#4F39F6] font-black">{course.progress}%</span>
           </div>
-          <div className="h-1.5 w-full rounded-full bg-slate-800">
-            <div className="h-1.5 rounded-full bg-gradient-to-r from-emerald-500 to-teal-400 progress-bar-fill shadow-[0_0_8px_rgba(16,185,129,0.3)]" style={{ width: `${course.progress}%` }} />
+          <div className="h-2 w-full rounded-full bg-[#EEF0FF]">
+            <div className="h-2 rounded-full bg-[#4F39F6] progress-bar-fill" style={{ width: `${course.progress}%` }} />
           </div>
         </div>
         
@@ -60,10 +62,10 @@ export function CourseCard({ course, isSelected, isLocked, isCompleted, onSelect
             }
           }}
           disabled={isLocked}
-          className={`w-full rounded-xl py-2.5.5 text-xs font-extrabold uppercase tracking-wider transition-all duration-300 ${
+          className={`w-full rounded-2xl py-3 text-xs font-extrabold uppercase tracking-wider transition-all duration-300 cursor-pointer ${
             isLocked
-              ? 'cursor-not-allowed bg-slate-800/50 text-slate-500 border border-slate-800'
-              : 'bg-gradient-to-r from-emerald-600 to-teal-500 text-white shadow-md shadow-emerald-500/10 btn-shimmer hover:brightness-110'
+              ? 'cursor-not-allowed bg-[#F8FAFC] text-[#64748B] border border-[#E2E8F0]'
+              : 'bg-[#4F39F6] text-white shadow-md shadow-[#4F39F6]/20 btn-shimmer hover:bg-[#4338CA]'
           }`}
         >
           {isLocked ? 'Locked (Complete previous)' : 'Resume Course'}

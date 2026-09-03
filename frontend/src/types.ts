@@ -2,6 +2,13 @@ export type CourseLevel = 'Beginner' | 'Intermediate' | 'Advanced'
 
 export type LessonType = 'video' | 'reading' | 'quiz'
 
+export type RelatedVideo = {
+  id: string
+  title: string
+  duration: string
+  channel?: string
+}
+
 export type Lesson = {
   id: string
   title: string
@@ -10,6 +17,7 @@ export type Lesson = {
   isCompleted: boolean
   youtubeId?: string
   content?: string
+  relatedVideos?: RelatedVideo[]
 }
 
 export type QuizQuestion = {
